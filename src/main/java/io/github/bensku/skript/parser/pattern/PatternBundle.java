@@ -1,6 +1,7 @@
 package io.github.bensku.skript.parser.pattern;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -40,56 +41,37 @@ public class PatternBundle {
     }
     
     public Iterator<Pattern> getPatterns(String input) {
-        return null;
-//        Pattern[] starts = startChars[input.codePointAt(0)];
-//        Pattern[] ends = endChars[input.codePointAt(input.length() - 1)];
-//        
-//        return new Iterator<Pattern>() {
-//            
-//            /**
-//             * Array we're currently iterating on.
-//             */
-//            private Pattern[] array = starts;
-//            
-//            /**
-//             * Index of element we last returned. -1 when we haven't returned
-//             * anything yet.
-//             */
-//            private int index = -1;
-//            
-//            @Override
-//            public boolean hasNext() {
-//                if (index < array.length - 1) {
-//                    return true;
-//                } else {
-//                    return array != patterns; // Reference equality intended
-//                }
-//            }
-//
-//            @Override
-//            public Pattern next() {
-//                if (array == null) { // Next array
-//                    if (starts == null) {
-//                        if (ends == null) {
-//                            array = patterns;
-//                        } else {
-//                            array = ends;
-//                        }
-//                    } else if (ends == null) {
-//                        array = patterns;
-//                    }
-//                    index = -1;
-//                }
-//                index++;
-//                if (index == array.length) { // Next array
-//                    if (array == starts) {
-//                        array = ends;
-//                    } else if (array == ends) {
-//                        array = patterns;
-//                    }
-//                }
-//                return array[index];
-//            }
-//        };
+        String reversed = new StringBuilder(input).reverse().toString();
+        
+        return new Iterator<Pattern>() {
+            
+            /**
+             * Trie search failed.
+             */
+            private boolean trieFailed;
+            
+            /**
+             * If we're iterating all patterns, index in array.
+             */
+            private int index;
+            
+            private String startStr = input.substring(0, 6);
+            private String endStr = reversed.substring(0, 6);
+            
+            private Iterator<Pattern> startPatterns = starts.prefixMap(startStr).values().iterator();
+            private Iterator<Pattern> endPatterns = ends.prefixMap(endStr).values().iterator();
+            
+            private boolean start = true;
+            
+            @Override
+            public boolean hasNext() {
+                return trieFailed && index < patterns.length;
+            }
+
+            @Override
+            public Pattern next() {
+                return null;
+            }
+        };
     }
 }
