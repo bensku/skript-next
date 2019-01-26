@@ -1,7 +1,5 @@
 package io.github.bensku.skript.parser.pattern;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -19,10 +17,17 @@ public class PatternBundle {
     
     private final PatriciaTrie<Pattern> ends;
     
+    private final int patriciaMaxLength;
+    
+    private final int patriciaMinLength;
+    
     PatternBundle(List<Pattern> patterns) {
         this.patterns = patterns.toArray(new Pattern[patterns.size()]);
         this.starts = new PatriciaTrie<>();
         this.ends = new PatriciaTrie<>();
+        this.patriciaMaxLength = 6;
+        this.patriciaMinLength = 3;
+        computeTries();
     }
     
     private void computeTries() {
@@ -42,21 +47,17 @@ public class PatternBundle {
     
     public Iterator<Pattern> getPatterns(String input) {
         String reversed = new StringBuilder(input).reverse().toString();
+        int startLen = input.length() < patriciaMaxLength ? input.length() : patriciaMaxLength;
         
         return new Iterator<Pattern>() {
             
             /**
-             * Trie search failed.
+             * If we're iterating all patterns, index in array. Else, -1.
              */
-            private boolean trieFailed;
+            private int index = -1;
             
-            /**
-             * If we're iterating all patterns, index in array.
-             */
-            private int index;
-            
-            private String startStr = input.substring(0, 6);
-            private String endStr = reversed.substring(0, 6);
+            private String startStr = input.substring(0, startLen);
+            private String endStr = reversed.substring(0, startLen);
             
             private Iterator<Pattern> startPatterns = starts.prefixMap(startStr).values().iterator();
             private Iterator<Pattern> endPatterns = ends.prefixMap(endStr).values().iterator();
@@ -65,12 +66,60 @@ public class PatternBundle {
             
             @Override
             public boolean hasNext() {
-                return trieFailed && index < patterns.length;
+                return index < patterns.length;
             }
 
             @Override
             public Pattern next() {
-                return null;
+                if (index >= 0) { // Looping through all patterns
+                    return patterns[index++];
+                } else if (start) {
+                    return startNext();
+                } else {
+                    return endNext();
+                }
+            }
+            
+            private Pattern startNext() {
+                if (startPatterns.hasNext()) {
+                    return startPatterns.next();
+                } else {
+                    start = false;
+                    if (startStr.length() <= patriciaMinLength) {
+                        startPatterns = null;
+                        if (endPatterns == null) {
+                            return endNext();
+                        } else {
+                            index = 0;
+                            return patterns[index++];
+                        }
+                    } else {
+                        startStr = startStr.substring(0, startStr.length() - 1);
+                        startPatterns = starts.prefixMap(startStr).values().iterator();
+                        return startNext();
+                    }
+                }
+            }
+            
+            private Pattern endNext() {
+                if (endPatterns.hasNext()) {
+                    return endPatterns.next();
+                } else {
+                    start = true;
+                    if (endStr.length() <= patriciaMinLength) {
+                        endPatterns = null;
+                        if (startPatterns == null) {
+                            return startNext();
+                        } else {
+                            index = 0;
+                            return patterns[index++];
+                        }
+                    } else {
+                        endStr = endStr.substring(0, endStr.length() - 1);
+                        endPatterns = ends.prefixMap(endStr).values().iterator();
+                        return startNext();
+                    }
+                }
             }
         };
     }
