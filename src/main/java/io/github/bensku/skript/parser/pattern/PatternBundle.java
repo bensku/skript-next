@@ -11,14 +11,29 @@ import org.apache.commons.collections4.trie.PatriciaTrie;
  */
 public class PatternBundle {
     
+    /**
+     * ALL patterns.
+     */
     private final Pattern[] patterns;
     
+    /**
+     * A trie with patterns from start to end.
+     */
     private final PatriciaTrie<Pattern> starts;
     
+    /**
+     * A trie with patterns from end to start.
+     */
     private final PatriciaTrie<Pattern> ends;
     
+    /**
+     * Maximum prefix/suffix length for trie queries.
+     */
     private final int patriciaMaxLength;
     
+    /**
+     * Minimum prefix/suffix length for trie queries.
+     */
     private final int patriciaMinLength;
     
     PatternBundle(List<Pattern> patterns) {
@@ -45,10 +60,23 @@ public class PatternBundle {
         }
     }
     
+    /**
+     * Gets an iterator for all patterns. The order which they're provided will
+     * be optimized based on input. Same patterns may be provided multiple
+     * times, because avoiding this would not be efficient.
+     * @param input Input to get patterns for.
+     * @return Iterator for ALL patterns, provided in order from most likely to
+     * least likely based on the given input.
+     */
     public Iterator<Pattern> getPatterns(String input) {
         String reversed = new StringBuilder(input).reverse().toString();
         int startLen = input.length() < patriciaMaxLength ? input.length() : patriciaMaxLength;
         
+        /*
+         * Iterator switches between starts and ends when their iterators are
+         * out of patterns. Finally, it falls back to going through all
+         * patterns when both of them have reached minimum length.
+         */
         return new Iterator<Pattern>() {
             
             /**
