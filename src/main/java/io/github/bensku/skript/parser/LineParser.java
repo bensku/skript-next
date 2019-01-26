@@ -7,6 +7,8 @@ import java.util.Map;
 import io.github.bensku.skript.bitcode.Instruction;
 import io.github.bensku.skript.parser.pattern.Pattern;
 import io.github.bensku.skript.parser.pattern.PatternBundle;
+import io.github.bensku.skript.parser.pattern.PatternPart;
+import io.github.bensku.skript.util.StringUtils;
 
 public class LineParser {
     
@@ -23,7 +25,23 @@ public class LineParser {
             Pattern pattern = it.next();
             
             // If start or end are literals, make sure they match input
-            // TODO
+            PatternPart first = pattern.getFirst();
+            if (first instanceof PatternPart.Literal) {
+                String text = ((PatternPart.Literal) first).getText();
+                if (!StringUtils.startsWith(input, start, end, text, 0, text.length())) {
+                    continue; // Pattern does not match
+                }
+            }
+            PatternPart last = pattern.getLast();
+            if (last instanceof PatternPart.Expression) {
+                String text = ((PatternPart.Literal) last).getText();
+                if (!StringUtils.startsWith(input, start, end, text, 0, text.length())) {
+                    continue; // Pattern does not match
+                }
+            }
+            
+            PatternPart[] parts = pattern.getParts();
+            int[] starts = new int[parts.length];
             
             while (true) {
                 // Try to find rest of literal parts from input in right order
