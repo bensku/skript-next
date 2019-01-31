@@ -16,11 +16,11 @@ public class LineParser {
     
     private Map<Class<?>, PatternBundle> bundles;
     
-    public void parse(String input, List<Instruction> instrs) {
-        parse(void.class, input, 0, input.length(), instrs);
+    public AstNode parse(String input, List<Instruction> instrs) {
+        return parse(void.class, input, 0, input.length(), instrs);
     }
     
-    public boolean parse(Class<?> type, String input, int start, int end, List<Instruction> instrs) {
+    public AstNode parse(Class<?> type, String input, int start, int end, List<Instruction> instrs) {
         PatternBundle patterns = bundles.get(type);
         Iterator<Pattern> it = patterns.getPatterns(input);
         while (it.hasNext()) {
@@ -52,9 +52,15 @@ public class LineParser {
             
             // Try all permutations of literal parts (iteratively)
             while (true) {
+                /**
+                 * If the permutation doesn't break order of literal parts,
+                 * it is considered sane and parsing expression parts will be
+                 * attempted.
+                 */
+                boolean sane = true;
+                
                 // Make sure we have sane permutation
                 int prev = Integer.MIN_VALUE;
-                boolean sane = true;
                 for (int i = 0; i < permutation.length; i++) {
                     List<Integer> list = starts[i];
                     if (list == null) {
@@ -69,8 +75,21 @@ public class LineParser {
                 
                 // If permutation is sane, try to parse expression parts
                 if (sane) {
+                    /**
+                     * Whether parsing this permutation succeeded or not.
+                     */
                     boolean success = true;
+                    
+                    /**
+                     * Index on line where next expression part starts.
+                     */
                     int next = start;
+                    
+                    /**
+                     * This is filled with child nodes as they are parsed.
+                     * Some of them might be nulls if the parts are optional (TODO implement it).
+                     */
+                    AstNode[] children = new AstNode[parts.length];
                     for (int i = 0; i < parts.length; i++) {
                         List<Integer> list = starts[i];
                         if (list == null) { // Expression
@@ -85,8 +104,10 @@ public class LineParser {
                             // Parse for different return types
                             boolean exprParsed = false;
                             for (Class<?> ret : part.getTypes()) {
-                                if (parse(ret, input, next, exprEnd, instrs)) {
+                                AstNode node = parse(ret, input, next, exprEnd, instrs);
+                                if (node != null) {
                                     exprParsed = true; // Expression parsing ok
+                                    children[i] = node; // Possible child node
                                 }
                             }
                             
@@ -100,27 +121,22 @@ public class LineParser {
                         }
                     }
                     
+                    // Check if parsing all expression parts succeeded
                     if (success) {
-                        // TODO emit instruction
-                        return true; // Pattern match found!
+                        // Return node with this pattern and the children we parsed
+                        return new AstNode(pattern, children);
                     }
                 }
                 
                 // This permutation didn't match, try next one
-                int permutateTarget = 0;
-                while (permutation[permutateTarget]++ == starts[permutateTarget].size()) {
-                    // To zero and mutate next in array
-                    permutation[permutateTarget] = 0;
-                    permutateTarget++;
-                    if (permutateTarget == permutation.length) { // Pattern doesn't match
-                        break;
-                    }
+                if (!permutate(permutation, starts)) {
+                    break; // No more permutations, pattern doesn't match
                 }
             }
         }
         
         // Nothing matched the input
-        return false;
+        return null;
     }
     
     private List<Integer>[] getStarts(PatternPart[] parts, String input, int start, int end) {
@@ -151,5 +167,39 @@ public class LineParser {
         }
         
         return starts;
+    }
+    
+    /**
+     * Attempts to mutate given permutation array to provide different indices
+     * in given lists of start points.
+     * @param permutation Array of indices to given lists. It will be mutated!
+     * @param starts Array of lists that contain possible starting positions.
+     * @return Whether mutation succeeded or not.
+     */
+    private boolean permutate(int[] permutation, List<Integer>[] starts) {
+        /**
+         * The part for which we're about to try different placement for.
+         */
+        int permutateTarget = 0;
+        while (true) {
+            List<Integer> list = starts[permutateTarget];
+            if (list == null) { // Can't find new place for expression part
+                permutateTarget++; // Next part
+                continue;
+            } else { // Literal part might be mutable
+                if (permutation[permutateTarget] == list.size() - 1) { // This part can't be mutated more
+                    permutation[permutateTarget] = 0;
+                    permutateTarget++;
+                    if (permutateTarget == permutation.length) { // ... and it is last part
+                        return false; // Out of permutations
+                    } else { // ... but we can just mutate next part
+                        continue;
+                    }
+                } else { // Mutate this part
+                    permutation[permutateTarget]++;
+                    return true;
+                }
+            }
+        }
     }
 }
