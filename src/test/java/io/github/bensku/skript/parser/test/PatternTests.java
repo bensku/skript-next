@@ -21,11 +21,11 @@ public class PatternTests {
     public void patternTest() {
         // Test pattern parts with malformed parameters
         assertThrows(AssertionError.class, () -> new PatternPart.Literal(null));
-        assertThrows(AssertionError.class, () -> new PatternPart.Expression(null, true));
+        assertThrows(AssertionError.class, () -> new PatternPart.Expression(null));
         
         // Test pattern creation and methods it has
         PatternPart[] parts = new PatternPart[] {new PatternPart.Literal("foo"),
-                new PatternPart.Expression(new Class[] {Object.class}, true), new PatternPart.Literal("bar")};
+                new PatternPart.Expression(new Class[] {Object.class}), new PatternPart.Literal("bar")};
         Pattern pattern = new Pattern(parts);
         assertEquals(parts[0], pattern.getFirst());
         assertEquals(parts[2], pattern.getLast());
@@ -39,7 +39,7 @@ public class PatternTests {
         
         // Test adding a pattern to registry, then compiling it
         PatternPart[] parts = new PatternPart[] {new PatternPart.Literal("foo"),
-                new PatternPart.Expression(new Class[] {Object.class}, true), new PatternPart.Literal("bar")};
+                new PatternPart.Expression(new Class[] {Object.class}), new PatternPart.Literal("bar")};
         Pattern pattern = new Pattern(parts);
         registry.addSyntax(Object.class, pattern);
         assertEquals(1, registry.compile().size());
@@ -49,7 +49,7 @@ public class PatternTests {
     public void bundleTest() {
         PatternRegistry registry = new PatternRegistry();        
         PatternPart[] parts = new PatternPart[] {new PatternPart.Literal("foo"),
-                new PatternPart.Expression(new Class[] {Object.class}, true), new PatternPart.Literal("bar")};
+                new PatternPart.Expression(new Class[] {Object.class}), new PatternPart.Literal("bar")};
         Pattern pattern = new Pattern(parts);
         registry.addSyntax(Object.class, pattern);
         
@@ -64,7 +64,7 @@ public class PatternTests {
         PatternRegistry registry = new PatternRegistry();
         for (int i = 0; i < 100; i++) {
             PatternPart[] parts = new PatternPart[] {new PatternPart.Literal(UUID.randomUUID().toString()),
-                    new PatternPart.Expression(new Class[] {Object.class}, true), new PatternPart.Literal(UUID.randomUUID().toString())};
+                    new PatternPart.Expression(new Class[] {Object.class}), new PatternPart.Literal(UUID.randomUUID().toString())};
             Pattern pattern = new Pattern(parts);
             registry.addSyntax(Object.class, pattern);
         }
@@ -74,5 +74,18 @@ public class PatternTests {
         while (it.hasNext()) {
             assertNotNull(it.next());
         }
+    }
+    
+    @Test
+    public void builderTest() {
+        Pattern pattern = Pattern.builder()
+                .literal("foo")
+                .expression(Object.class)
+                .literal("bar")
+                .build();
+        assertEquals("foo", ((PatternPart.Literal) pattern.getFirst()).getText());
+        assertEquals(Object.class, ((PatternPart.Expression) pattern.getParts()[1]).getTypes()[0]);
+        assertEquals("bar", ((PatternPart.Literal) pattern.getLast()).getText());
+
     }
 }

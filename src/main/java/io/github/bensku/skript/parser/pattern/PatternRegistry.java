@@ -20,7 +20,7 @@ public class PatternRegistry {
         this.patterns = new HashMap<>();
     }
     
-    public void addSyntax(Class<?> returnType, Pattern pattern) {
+    public PatternRegistry addSyntax(Class<?> returnType, Pattern pattern) {
         assert returnType != null;
         assert pattern != null;
         patterns.compute(returnType, (k, v) -> {
@@ -29,6 +29,7 @@ public class PatternRegistry {
             v.add(pattern);
             return v;
         });
+        return this;
     }
     
     public Map<Class<?>, PatternBundle> compile() {

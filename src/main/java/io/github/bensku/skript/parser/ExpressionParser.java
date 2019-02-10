@@ -1,6 +1,7 @@
 package io.github.bensku.skript.parser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,14 @@ import io.github.bensku.skript.util.StringUtils;
 
 public class ExpressionParser {
     
+    /**
+     * Pattern bundles by their return types.
+     */
     private Map<Class<?>, PatternBundle> bundles;
+    
+    public ExpressionParser(Map<Class<?>, PatternBundle> bundles) {
+        this.bundles = bundles;
+    }
     
     public AstNode parse(String input) {
         return parse(void.class, input, 0, input.length());
@@ -21,6 +29,10 @@ public class ExpressionParser {
     
     public AstNode parse(Class<?> type, String input, int start, int end) {
         PatternBundle patterns = bundles.get(type);
+        if (patterns == null) { // No patterns for this type
+            return null;
+        }
+        
         Iterator<Pattern> it = patterns.getPatterns(input);
         while (it.hasNext()) {
             Pattern pattern = it.next();
@@ -34,7 +46,8 @@ public class ExpressionParser {
                 }
             }
             PatternPart last = pattern.getLast();
-            if (last instanceof PatternPart.Expression) {
+            // Intentional reference equality; this is just an optimization
+            if (first != last && last instanceof PatternPart.Expression) {
                 String text = ((PatternPart.Literal) last).getText();
                 if (!StringUtils.startsWith(input, start, end, text, 0, text.length())) {
                     continue; // Pattern does not match
@@ -86,7 +99,6 @@ public class ExpressionParser {
                     
                     /**
                      * This is filled with child nodes as they are parsed.
-                     * Some of them might be nulls if the parts are optional (TODO implement it).
                      */
                     AstNode[] children = new AstNode[parts.length];
                     for (int i = 0; i < parts.length; i++) {
@@ -161,6 +173,8 @@ public class ExpressionParser {
                 }
                 if (placements.isEmpty()) {
                     return null; // Failed to find a part, pattern doesn't match+
+                } else {
+                    starts[i] = placements;
                 }
             } // else: leave null in starts
         }

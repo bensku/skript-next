@@ -1,5 +1,9 @@
 package io.github.bensku.skript.parser.pattern;
 
+import java.util.Arrays;
+
+import org.apache.commons.math3.analysis.function.Exp;
+
 /**
  * A syntax part.
  *
@@ -22,6 +26,19 @@ public class PatternPart {
         public String getText() {
             return text;
         }
+        
+        @Override
+        public String toString() {
+            return "Literal{\"" + text + "\"}";
+        }
+        
+        @Override
+        public boolean equals(Object o) {
+            if (!(o instanceof Literal)) {
+                return false;
+            }
+            return text.equals(((Literal) o).text);
+        }
     }
     
     public static class Expression extends PatternPart {
@@ -31,24 +48,27 @@ public class PatternPart {
          */
         private final Class<?>[] types;
         
-        /**
-         * Whether leaving this expression out is acceptable or not.
-         */
-        private final boolean nullable;
-        
-        public Expression(Class<?>[] types, boolean nullable) {
+        public Expression(Class<?>[] types) {
             assert types != null;
             assert types.length > 0;
             this.types = types;
-            this.nullable = nullable;
         }
         
         public Class<?>[] getTypes() {
             return types;
         }
         
-        public boolean isNullable() {
-            return nullable;
+        @Override
+        public String toString() {
+            return "Expression{" + Arrays.toString(types) + "}";
+        }
+        
+        @Override
+        public boolean equals(Object o) {
+            if (!(o instanceof Expression)) {
+                return false;
+            }
+            return Arrays.equals(types, ((Expression) o).types);
         }
     }
 }

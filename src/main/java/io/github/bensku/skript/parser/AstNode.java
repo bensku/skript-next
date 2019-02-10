@@ -1,5 +1,7 @@
 package io.github.bensku.skript.parser;
 
+import java.util.Arrays;
+
 import io.github.bensku.skript.parser.pattern.Pattern;
 
 public class AstNode {
@@ -25,5 +27,19 @@ public class AstNode {
     
     public AstNode[] getChildren() {
         return children;
+    }
+    
+    @Override
+    public String toString() {
+        return "AstNode{pattern=" + pattern + ",children=" + Arrays.toString(children) + "}";
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof AstNode)) {
+            return false;
+        }
+        AstNode node = (AstNode) o;
+        return pattern.equals(node.pattern) && Arrays.equals(children, node.children);
     }
 }
