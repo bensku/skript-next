@@ -5,22 +5,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import io.github.bensku.skript.bitcode.Instruction;
 import io.github.bensku.skript.parser.pattern.Pattern;
 import io.github.bensku.skript.parser.pattern.PatternBundle;
 import io.github.bensku.skript.parser.pattern.PatternPart;
 import io.github.bensku.skript.parser.pattern.PatternPart.Expression;
 import io.github.bensku.skript.util.StringUtils;
 
-public class LineParser {
+public class ExpressionParser {
     
     private Map<Class<?>, PatternBundle> bundles;
     
-    public AstNode parse(String input, List<Instruction> instrs) {
-        return parse(void.class, input, 0, input.length(), instrs);
+    public AstNode parse(String input) {
+        return parse(void.class, input, 0, input.length());
     }
     
-    public AstNode parse(Class<?> type, String input, int start, int end, List<Instruction> instrs) {
+    public AstNode parse(Class<?> type, String input, int start, int end) {
         PatternBundle patterns = bundles.get(type);
         Iterator<Pattern> it = patterns.getPatterns(input);
         while (it.hasNext()) {
@@ -104,7 +103,7 @@ public class LineParser {
                             // Parse for different return types
                             boolean exprParsed = false;
                             for (Class<?> ret : part.getTypes()) {
-                                AstNode node = parse(ret, input, next, exprEnd, instrs);
+                                AstNode node = parse(ret, input, next, exprEnd);
                                 if (node != null) {
                                     exprParsed = true; // Expression parsing ok
                                     children[i] = node; // Possible child node
