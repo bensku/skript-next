@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import io.github.bensku.skript.parser.pattern.PatternPart.Literal;
+
 public class Pattern {
     
     /**
@@ -50,6 +52,24 @@ public class Pattern {
         assert parts != null;
         assert parts.length > 0;
         this.parts = parts;
+        
+        // Ensure that there are no two consecutive literal/expression parts
+        if (parts.length > 1) {
+	        boolean literal = parts[0] instanceof Literal;
+	        for (int i = 1; i < parts.length; i++) {
+	        	if (parts[i] instanceof Literal) {
+	        		if (literal) {
+	        			throw new IllegalArgumentException("two consecutive literals");
+	        		}
+	        		literal = true;
+	        	} else {
+	        		if (!literal) {
+	        			throw new IllegalArgumentException("two consecutive expressions");
+	        		}
+	        		literal = false;
+	        	}
+	        }
+        }
     }
     
     public PatternPart[] getParts() {

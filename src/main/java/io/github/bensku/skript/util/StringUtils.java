@@ -12,7 +12,7 @@ public class StringUtils {
             return false; // String can't be shorter than what it starts with is
         }
         
-        for (int i = start1, j = start2; j < end1;) {
+        for (int i = start1, j = start2; j < end2;) {
             int c1 = str1.codePointAt(i);
             int c2 = str2.codePointAt(j);
             if (c1 != c2) {
@@ -23,5 +23,27 @@ public class StringUtils {
             j += ccount;
         }
         return true;
+    }
+    
+    public static int trimStart(String str, int start) {
+    	for (int i = start; i < str.length();) {
+    		int c = str.codePointAt(i);
+    		if (!Character.isWhitespace(c)) {
+    			return i;
+    		}
+    		i += Character.charCount(c);
+    	}
+    	return str.length();
+    }
+    
+    public static int trimEnd(String str, int end) {
+    	for (int i = end - 1; i >= 0;) {
+    		int c = str.codePointAt(i);
+    		if (!Character.isWhitespace(c)) {
+    			return i + 1;
+    		}
+    		i -= Character.charCount(c);
+    	}
+    	return 0;
     }
 }

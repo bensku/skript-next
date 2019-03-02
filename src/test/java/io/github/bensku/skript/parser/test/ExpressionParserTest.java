@@ -24,6 +24,27 @@ public class ExpressionParserTest {
         PatternRegistry registry = new PatternRegistry()
                 .addSyntax(Object.class, Pattern.builder().literal("test").build());
         ExpressionParser parser = new ExpressionParser(registry.compile());
-        assertEquals(new AstNode(Pattern.builder().literal("test").build(), new AstNode[1]), parser.parse(Object.class, "test", 0, 4));
+        assertEquals(new AstNode(Pattern.builder().literal("test").build(),
+        		new AstNode[1]), parser.parse(Object.class, "test", 0, 4));
+    }
+    
+    @Test
+    public void simpleExpression() {
+        PatternRegistry registry = new PatternRegistry()
+                .addSyntax(Object.class, Pattern.builder().literal("foo").expression(String.class).literal("bar").build())
+                .addSyntax(String.class, Pattern.builder().literal("teststr").build());
+        ExpressionParser parser = new ExpressionParser(registry.compile());
+        assertEquals(new AstNode(Pattern.builder().literal("foo").expression(String.class).literal("bar").build(),
+        		new AstNode[] {null, new AstNode(Pattern.builder().literal("teststr").build(), new AstNode[1]), null}),
+        		parser.parse(Object.class, "foo teststr bar", 0, 15));
+    }
+    
+    @Test
+    public void faultyExpression() {
+        PatternRegistry registry = new PatternRegistry()
+                .addSyntax(Object.class, Pattern.builder().literal("foo").expression(String.class).literal("bar").build())
+                .addSyntax(String.class, Pattern.builder().literal("teststr").build());
+        ExpressionParser parser = new ExpressionParser(registry.compile());
+        assertNull(parser.parse(Object.class, "foo abc teststr bar", 0, 15));
     }
 }

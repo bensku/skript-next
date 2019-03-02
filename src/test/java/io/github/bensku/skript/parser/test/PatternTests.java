@@ -30,6 +30,16 @@ public class PatternTests {
         assertEquals(parts[0], pattern.getFirst());
         assertEquals(parts[2], pattern.getLast());
         assertEquals(parts, pattern.getParts());
+        
+        // Test that builder calls constructor correctly
+        assertEquals(pattern, Pattern.builder().literal("foo").expression(Object.class).literal("bar").build());
+    }
+    
+    @Test
+    public void faultyPatternTest() {
+        // Test pattern creation and methods it has
+        PatternPart[] parts = new PatternPart[] {new PatternPart.Literal("foo"), new PatternPart.Literal("bar")};
+    	assertThrows(IllegalArgumentException.class, () -> new Pattern(parts));
     }
     
     @Test

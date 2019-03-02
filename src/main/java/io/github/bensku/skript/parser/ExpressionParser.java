@@ -33,6 +33,10 @@ public class ExpressionParser {
             return null;
         }
         
+        // Ignore whitespace at start and end
+        start = StringUtils.trimStart(input, start);
+        end = StringUtils.trimEnd(input, end);
+        
         Iterator<Pattern> it = patterns.getPatterns(input);
         while (it.hasNext()) {
             Pattern pattern = it.next();
@@ -109,7 +113,7 @@ public class ExpressionParser {
                             if (i + 1 == parts.length) { // Expression is last
                                 exprEnd = end;
                             } else {
-                                exprEnd = starts[i].get(permutation[i]);
+                                exprEnd = starts[i + 1].get(permutation[i]);
                             }
                             
                             // Parse for different return types
