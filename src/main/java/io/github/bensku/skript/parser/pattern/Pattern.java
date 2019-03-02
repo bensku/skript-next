@@ -52,24 +52,28 @@ public class Pattern {
         assert parts != null;
         assert parts.length > 0;
         this.parts = parts;
-        
+        assert sanitizePattern();
+    }
+    
+    private boolean sanitizePattern() {
         // Ensure that there are no two consecutive literal/expression parts
         if (parts.length > 1) {
 	        boolean literal = parts[0] instanceof Literal;
 	        for (int i = 1; i < parts.length; i++) {
 	        	if (parts[i] instanceof Literal) {
 	        		if (literal) {
-	        			throw new IllegalArgumentException("two consecutive literals");
+	        			assert false : "two consecutive literals";
 	        		}
 	        		literal = true;
 	        	} else {
 	        		if (!literal) {
-	        			throw new IllegalArgumentException("two consecutive expressions");
+	        			assert false : "two consecutive expressions";
 	        		}
 	        		literal = false;
 	        	}
 	        }
         }
+        return true;
     }
     
     public PatternPart[] getParts() {

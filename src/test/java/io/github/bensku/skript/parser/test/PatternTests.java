@@ -39,7 +39,7 @@ public class PatternTests {
     public void faultyPatternTest() {
         // Test pattern creation and methods it has
         PatternPart[] parts = new PatternPart[] {new PatternPart.Literal("foo"), new PatternPart.Literal("bar")};
-    	assertThrows(IllegalArgumentException.class, () -> new Pattern(parts));
+    	assertThrows(AssertionError.class, () -> new Pattern(parts));
     }
     
     @Test

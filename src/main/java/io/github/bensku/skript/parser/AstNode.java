@@ -4,6 +4,14 @@ import java.util.Arrays;
 
 import io.github.bensku.skript.parser.pattern.Pattern;
 
+/**
+ * Represents an abstract syntax tree node. It contains the pattern that was
+ * matched to produce it, and an array of child nodes for all parts of that.
+ * For literal parts, child nodes are always null. For expression parts, they
+ * are nodes with patterns that matched our pattern's return type requirements
+ * and the text written by user.
+ *
+ */
 public class AstNode {
 
     /**
@@ -17,6 +25,8 @@ public class AstNode {
     private final AstNode[] children;
     
     public AstNode(Pattern pattern, AstNode[] children) {
+    	assert pattern != null;
+    	assert children != null;
         this.pattern = pattern;
         this.children = children;
     }

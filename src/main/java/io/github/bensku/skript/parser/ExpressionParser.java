@@ -1,7 +1,6 @@
 package io.github.bensku.skript.parser;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -9,9 +8,13 @@ import java.util.Map;
 import io.github.bensku.skript.parser.pattern.Pattern;
 import io.github.bensku.skript.parser.pattern.PatternBundle;
 import io.github.bensku.skript.parser.pattern.PatternPart;
-import io.github.bensku.skript.parser.pattern.PatternPart.Expression;
 import io.github.bensku.skript.util.StringUtils;
 
+/**
+ * Parses expressions to {@link AstNode}s. Nested expressions are parsed
+ * recursively, but everything else is done iteratively.
+ *
+ */
 public class ExpressionParser {
     
     /**
@@ -27,6 +30,15 @@ public class ExpressionParser {
         return parse(void.class, input, 0, input.length());
     }
     
+    /**
+     * Attempts to parse the given input using one of our patterns into an
+     * AST node.
+     * @param type Return type of the expression.
+     * @param input Input string.
+     * @param start Start in input.
+     * @param end End in input.
+     * @return AST node, or null if no pattern matched the input.
+     */
     public AstNode parse(Class<?> type, String input, int start, int end) {
         PatternBundle patterns = bundles.get(type);
         if (patterns == null) { // No patterns for this type
@@ -75,7 +87,7 @@ public class ExpressionParser {
                  */
                 boolean sane = true;
                 
-                // Make sure we have sane permutation
+                // Make sure we have sane permutation; literal parts must be in order!
                 int prev = Integer.MIN_VALUE;
                 for (int i = 0; i < permutation.length; i++) {
                     List<Integer> list = starts[i];
@@ -108,7 +120,7 @@ public class ExpressionParser {
                     for (int i = 0; i < parts.length; i++) {
                         List<Integer> list = starts[i];
                         if (list == null) { // Expression
-                            PatternPart.Expression part = (Expression) parts[i];
+                            PatternPart.Expression part = (PatternPart.Expression) parts[i];
                             int exprEnd;
                             if (i + 1 == parts.length) { // Expression is last
                                 exprEnd = end;
@@ -154,6 +166,18 @@ public class ExpressionParser {
         return null;
     }
     
+    /**
+     * Gets an array of lists with all possible starting indices for literal
+     * parts of the pattern.
+     * @param parts Parts of the pattern.
+     * @param input Input to search parts from.
+     * @param start Start in input.
+     * @param end End in input.
+     * @return If not all literal parts can be placed, null. Otherwise, an
+     * array with length equal to amount of given parts. Array slots
+     * corresponding to literal parts are lists that contain all possible
+     * starting indices for the them. Other slots are nulls.
+     */
     private List<Integer>[] getStarts(PatternPart[] parts, String input, int start, int end) {
         @SuppressWarnings("unchecked")
         List<Integer>[] starts = new List[parts.length];

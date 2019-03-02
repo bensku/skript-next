@@ -45,6 +45,10 @@ public class PatternBundle {
         computeTries();
     }
     
+    /**
+     * Fills both normal (starts) and inverted (ends) tries with patterns that
+     * have start and/or end literal parts.
+     */
     private void computeTries() {
         for (Pattern pattern : patterns) {
             PatternPart first = pattern.getFirst();
