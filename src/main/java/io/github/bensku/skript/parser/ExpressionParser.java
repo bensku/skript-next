@@ -1,6 +1,7 @@
 package io.github.bensku.skript.parser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -125,7 +126,7 @@ public class ExpressionParser {
                             if (i + 1 == parts.length) { // Expression is last
                                 exprEnd = end;
                             } else {
-                                exprEnd = starts[i + 1].get(permutation[i]);
+                                exprEnd = starts[i + 1].get(permutation[i + 1]);
                             }
                             
                             // Parse for different return types

@@ -47,4 +47,15 @@ public class ExpressionParserTest {
         ExpressionParser parser = new ExpressionParser(registry.compile());
         assertNull(parser.parse(Object.class, "foo abc teststr bar", 0, 15));
     }
+    
+    @Test
+    public void hardExpression1() {
+    	// Challenge: correctly identify the literal part
+        PatternRegistry registry = new PatternRegistry()
+                .addSyntax(String.class, Pattern.builder().literal("testy").build())
+                .addSyntax(Object.class, Pattern.builder().expression(String.class).literal("testy").build());
+        ExpressionParser parser = new ExpressionParser(registry.compile());
+        assertEquals(new AstNode(Pattern.builder().expression(String.class).literal("testy").build(),
+        		new AstNode[] {new AstNode(Pattern.builder().literal("testy").build(), new AstNode[1]), null}), parser.parse(Object.class, "testy testy", 0, 11));
+    }
 }
