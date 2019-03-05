@@ -48,10 +48,16 @@ public class Pattern {
      */
     private final PatternPart[] parts;
     
+    /**
+     * Id of this pattern for compiler.
+     */
+    private int compilerId;
+    
     public Pattern(PatternPart[] parts) {
         assert parts != null;
         assert parts.length > 0;
         this.parts = parts;
+        this.compilerId = -1;
         assert sanitizePattern();
     }
     
@@ -86,6 +92,16 @@ public class Pattern {
     
     public PatternPart getLast() {
         return parts[parts.length - 1];
+    }
+    
+    public int getCompilerId() {
+    	assert compilerId != -1;
+    	return compilerId;
+    }
+    
+    public void setCompilerId(int id) {
+    	assert compilerId == -1;
+    	this.compilerId = id;
     }
     
     @Override
