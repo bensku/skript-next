@@ -46,4 +46,15 @@ public class StringUtils {
     	}
     	return 0;
     }
+    
+    public static boolean isWhitespace(String str, int start, int end) {
+    	for (int i = start; i < end;) {
+    		int c = str.codePointAt(i);
+    		if (!Character.isWhitespace(c)) {
+    			return false;
+    		}
+    		i += Character.charCount(c);
+    	}
+    	return true;
+    }
 }

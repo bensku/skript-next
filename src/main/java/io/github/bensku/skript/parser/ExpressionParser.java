@@ -2,6 +2,7 @@ package io.github.bensku.skript.parser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -89,17 +90,38 @@ public class ExpressionParser {
                 boolean sane = true;
                 
                 // Make sure we have sane permutation; literal parts must be in order!
+                // Also make sure we don't assign many parts to same place
                 int prev = Integer.MIN_VALUE;
+                boolean[] used = new boolean[end - start];
                 for (int i = 0; i < permutation.length; i++) {
                     List<Integer> list = starts[i];
                     if (list == null) {
                         continue; // Ignore expression part
                     }
+                    
+                    // Make sure this comes after previous part
                     int current = list.get(permutation[i]);
                     if (current < prev) { // Out of order permutation
                         sane = false;
                         break;
                     }
+                    
+                    // Check that current index hasn't been used before
+                    if (used[current]) { // Invalid permutation
+                    	sane = false;
+                    	break;
+                    }
+                    
+                    // Looks usable thus far...
+                    prev = current;
+                    used[current] = true;
+                }
+                
+                // Check that we don't have anything extra at start
+                if (starts[0] != null) { // Literal must start immediately
+                	if (starts[0].get(permutation[0]) != start) {
+                		sane = false;
+                	}
                 }
                 
                 // If permutation is sane, try to parse expression parts
@@ -150,7 +172,8 @@ public class ExpressionParser {
                     }
                     
                     // Check if parsing all expression parts succeeded
-                    if (success) {
+                    // If it did, make sure there is nothing but whitespace at end
+                    if (success && StringUtils.isWhitespace(input, next, end)) {
                         // Return node with this pattern and the children we parsed
                         return new AstNode(pattern, children);
                     }

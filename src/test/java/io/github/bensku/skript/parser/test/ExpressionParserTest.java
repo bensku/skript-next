@@ -29,6 +29,14 @@ public class ExpressionParserTest {
     }
     
     @Test
+    public void faultyLiteral() {
+        PatternRegistry registry = new PatternRegistry()
+                .addSyntax(Object.class, Pattern.builder().literal("test").build());
+        ExpressionParser parser = new ExpressionParser(registry.compile());
+        assertNull(parser.parse(Object.class, "foo test bar", 0, 4));
+    }
+    
+    @Test
     public void simpleExpression() {
         PatternRegistry registry = new PatternRegistry()
                 .addSyntax(Object.class, Pattern.builder().literal("foo").expression(String.class).literal("bar").build())
@@ -56,6 +64,16 @@ public class ExpressionParserTest {
                 .addSyntax(Object.class, Pattern.builder().expression(String.class).literal("testy").build());
         ExpressionParser parser = new ExpressionParser(registry.compile());
         assertEquals(new AstNode(Pattern.builder().expression(String.class).literal("testy").build(),
-        		new AstNode[] {new AstNode(Pattern.builder().literal("testy").build(), new AstNode[1]), null}), parser.parse(Object.class, "testy testy", 0, 11));
+        		new AstNode[] {new AstNode(Pattern.builder().literal("testy").build(), new AstNode[1]), null}),
+        		parser.parse(Object.class, "testy testy", 0, 11));
+    }
+    
+    @Test
+    public void hardExpression2() {
+    	// Challenge: do not assign a literal multiple times
+        PatternRegistry registry = new PatternRegistry()
+                .addSyntax(Object.class, Pattern.builder().literal("test").build());
+        ExpressionParser parser = new ExpressionParser(registry.compile());
+        assertNull(parser.parse(Object.class, "test test", 0, 9));
     }
 }
