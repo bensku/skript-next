@@ -3,42 +3,44 @@ package io.github.bensku.skript.compiler;
 import java.lang.reflect.Method;
 
 public class ExpressionInfo {
-    
+
     /**
      * The method that executes this expression. Its parameters are child
      * expressions of this expression.
      */
     private final Method callTarget;
-    
+
     /**
-     * Whether this expression is a literal or not. Literal expressions are
-     * executed compile-time instead of runtime.
+     * Whether this expression is a constant or not. Constant expressions are
+     * executed compile-time.
      */
-    private final boolean isLiteral;
-    
+    private final boolean isConstant;
+
     /**
-     * If child expressions of this expression are all literals and/or have
-     * been precomputed, this expression will be executed compile-time if
-     * precomputing it is allowed.
+     * If child expressions of this expressions are constants or have been
+     * constant-folded, this can be executed compile-time.
      */
-    private final boolean canBePrecomputed;
-    
-    public ExpressionInfo(Method callTarget, boolean isLiteral, boolean canBePrecomputed) {
+    private final boolean isConstantFoldable;
+
+    public ExpressionInfo(Method callTarget, boolean isConstant, boolean isConstantFoldable) {
+        assert callTarget != null;
+        assert callTarget.isAccessible();
+        assert isConstant ? isConstantFoldable : true;
         this.callTarget = callTarget;
-        this.isLiteral = isLiteral;
-        this.canBePrecomputed = canBePrecomputed;
+        this.isConstant = isConstant;
+        this.isConstantFoldable = isConstantFoldable;
     }
 
-	public Method getCallTarget() {
-		return callTarget;
-	}
+    public Method getCallTarget() {
+        return callTarget;
+    }
 
-	public boolean isLiteral() {
-		return isLiteral;
-	}
+    public boolean isConstant() {
+        return isConstant;
+    }
 
-	public boolean isCanBePrecomputed() {
-		return canBePrecomputed;
-	}
-    
+    public boolean isConstantFoldable() {
+        return isConstantFoldable;
+    }
+
 }
