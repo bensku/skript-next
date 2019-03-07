@@ -10,17 +10,17 @@ import io.github.bensku.skript.parser.AstNode;
 import io.github.bensku.skript.util.SneakyThrow;
 
 /**
- * Compiles scripts from AST to an intermediate format (IR).
+ * Compiles individual expressions from AST nodes to executable nodes.
  *
  */
-public class SkIrCompiler {
+public class ExpressionCompiler {
     
     /**
      * Expression infos by compiler ids of patterns.
      */
     private final ExpressionInfo[] infos;
     
-    public SkIrCompiler(ExpressionInfo... infos) {
+    public ExpressionCompiler(ExpressionInfo... infos) {
         assert infos != null;
         this.infos = infos;
     }

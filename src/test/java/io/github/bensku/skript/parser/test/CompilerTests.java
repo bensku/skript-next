@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
 import org.junit.jupiter.api.Test;
 
 import io.github.bensku.skript.compiler.ExpressionInfo;
-import io.github.bensku.skript.compiler.SkIrCompiler;
+import io.github.bensku.skript.compiler.ExpressionCompiler;
 import io.github.bensku.skript.compiler.node.ConstantNode;
 import io.github.bensku.skript.compiler.node.ExecutableNode;
 import io.github.bensku.skript.compiler.node.Node;
@@ -24,7 +24,7 @@ public class CompilerTests {
     public void constantNode() throws NoSuchMethodException, SecurityException {
         Method method = getClass().getDeclaredMethod("callNothing");
         method.setAccessible(true); // ???
-        SkIrCompiler compiler = new SkIrCompiler(new ExpressionInfo(method, true, true));
+        ExpressionCompiler compiler = new ExpressionCompiler(new ExpressionInfo(method, true, true));
         Pattern pattern = Pattern.builder().literal("test").build();
         pattern.setCompilerId(0);
         AstNode node = new AstNode(pattern, new AstNode[1]);
@@ -39,7 +39,7 @@ public class CompilerTests {
     public void nonFoldableNode() throws NoSuchMethodException, SecurityException {
         Method method = getClass().getDeclaredMethod("callNothing");
         method.setAccessible(true); // ???
-        SkIrCompiler compiler = new SkIrCompiler(new ExpressionInfo(method, false, false));
+        ExpressionCompiler compiler = new ExpressionCompiler(new ExpressionInfo(method, false, false));
         Pattern pattern = Pattern.builder().literal("test").build();
         pattern.setCompilerId(0);
         AstNode node = new AstNode(pattern, new AstNode[1]);
