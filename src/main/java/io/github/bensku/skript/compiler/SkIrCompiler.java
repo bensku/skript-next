@@ -20,7 +20,7 @@ public class SkIrCompiler {
      */
     private final ExpressionInfo[] infos;
     
-    public SkIrCompiler(ExpressionInfo[] infos) {
+    public SkIrCompiler(ExpressionInfo... infos) {
         assert infos != null;
         this.infos = infos;
     }

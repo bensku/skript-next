@@ -10,7 +10,7 @@ import io.github.bensku.skript.parser.ExpressionParser;
 import io.github.bensku.skript.parser.pattern.Pattern;
 import io.github.bensku.skript.parser.pattern.PatternRegistry;
 
-public class ExpressionParserTest {
+public class ExpressionParserTests {
     
     @Test
     public void noPatterns() {
