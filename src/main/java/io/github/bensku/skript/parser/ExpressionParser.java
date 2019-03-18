@@ -1,8 +1,6 @@
 package io.github.bensku.skript.parser;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +62,7 @@ public class ExpressionParser {
                 }
             }
             PatternPart last = pattern.getLast();
-            // Intentional reference equality; this is just an optimization
+            // Intentional reference equality; this is just an optional optimization
             if (first != last && last instanceof PatternPart.Expression) {
                 String text = ((PatternPart.Literal) last).getText();
                 if (!StringUtils.startsWith(input, start, end, text, 0, text.length())) {
@@ -72,6 +70,7 @@ public class ExpressionParser {
                 }
             }
             
+            // Find all occurrences of pattern parts
             PatternPart[] parts = pattern.getParts();
             List<Integer>[] starts = getStarts(parts, input, start, end);
             if (starts == null) {
