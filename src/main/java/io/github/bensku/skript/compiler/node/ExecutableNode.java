@@ -59,6 +59,11 @@ public class ExecutableNode implements Node {
             return null;
         }
 	}
+	
+	@Override
+	public Class<?> getReturnType() {
+	    return callTarget.getReturnType();
+	}
 
     @Override
     public boolean equals(Object obj) {

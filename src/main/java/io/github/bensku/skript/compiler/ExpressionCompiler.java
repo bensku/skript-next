@@ -2,6 +2,7 @@ package io.github.bensku.skript.compiler;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 
 import io.github.bensku.skript.compiler.node.ConstantNode;
 import io.github.bensku.skript.compiler.node.ExecutableNode;
@@ -45,14 +46,20 @@ public class ExpressionCompiler {
             return null;
         }
         
-        // Execute child expressions
+        // Compile child expressions
         Node[] children = new Node[callTarget.getParameterCount()];
+        Parameter[] params = callTarget.getParameters();
         boolean foldable = info.isConstantFoldable(); // Assume constant-foldable if allowed
         for (int i = 0; i < children.length; i++) {
             Node child = compile(node.getChildren()[i]);
             children[i] = child;
             if (child instanceof ExecutableNode) {
                 foldable = false; // Can't fold with non-constant children
+            }
+            
+            // Convert single parameters to arrays as needed
+            if (params[i].getType().isArray() && !child.getReturnType().isArray()) {
+                
             }
         }
         

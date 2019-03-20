@@ -20,7 +20,7 @@ public class ExpressionParser {
     /**
      * Pattern bundles by their return types.
      */
-    private Map<Class<?>, PatternBundle> bundles;
+    private final Map<Class<?>, PatternBundle> bundles;
     
     public ExpressionParser(Map<Class<?>, PatternBundle> bundles) {
         this.bundles = bundles;
@@ -154,6 +154,9 @@ public class ExpressionParser {
                             boolean exprParsed = false;
                             for (Class<?> ret : part.getTypes()) {
                                 AstNode node = parse(ret, input, next, exprEnd);
+                                if (node == null && ret.isArray()) {
+                                    node = parse(ret.getComponentType(), input, next, exprEnd);
+                                }
                                 if (node != null) {
                                     exprParsed = true; // Expression parsing ok
                                     children[i] = node; // Possible child node

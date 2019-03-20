@@ -14,6 +14,11 @@ public class ConstantNode implements Node {
     public Object execute() {
         return value;
     }
+    
+    @Override
+    public Class<?> getReturnType() {
+        return value.getClass();
+    }
 
     @Override
     public boolean equals(Object o) {
