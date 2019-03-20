@@ -148,22 +148,24 @@ public class PatternParser {
             if (c == '%') {
                 if (exprStart == -1) {
                     exprStart = i;
-                    builder.literal(literal.toString());
-                    literal = new StringBuilder();
+                    if (literal.length() != 0) {
+                        builder.literal(literal.toString());
+                        literal = new StringBuilder();
+                    }
                 } else {
                     exprEnd = i + 1;
-                    String exprInput = input.substring(exprStart + 1, exprEnd);
+                    String exprInput = input.substring(exprStart + 1, i);
                     exprStart = -1;
                     
                     String[] typeDefs = exprInput.split("/");
                     Class<?>[] types = new Class[typeDefs.length];
                     for (int j = 0; j < types.length; j++) {
-                        String def = typeDefs[i];
+                        String def = typeDefs[j];
                         Class<?> type = classes.get(def);
                         if (type == null) {
                             throw new IllegalArgumentException("no type registered with name '" + def + "'");
                         }
-                        types[i] = type;
+                        types[j] = type;
                     }
                     builder.expression(types);
                 }

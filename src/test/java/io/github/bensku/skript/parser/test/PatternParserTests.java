@@ -4,8 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
@@ -31,5 +33,15 @@ public class PatternParserTests {
         patterns.add(Pattern.builder().literal("test bar").build());
         patterns.add(Pattern.builder().literal("bar").build());
         assertEquals(patterns, parser.parsePatterns("[test] [foo] bar"));
+    }
+    
+    @Test
+    public void simpleExpression() {
+        Map<String, Class<?>> types = new HashMap<>();
+        types.put("string", String.class);
+        PatternParser parser = new PatternParser(types);
+        Set<Pattern> patterns = new HashSet<>();
+        patterns.add(Pattern.builder().expression(String.class).build());
+        assertEquals(patterns, parser.parsePatterns("%string%"));
     }
 }
