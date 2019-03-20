@@ -39,6 +39,11 @@ public class PatternPart {
             }
             return text.equals(((Literal) o).text);
         }
+        
+        @Override
+        public int hashCode() {
+            return text.hashCode();
+        }
     }
     
     public static class Expression extends PatternPart {
@@ -69,6 +74,15 @@ public class PatternPart {
                 return false;
             }
             return Arrays.equals(types, ((Expression) o).types);
+        }
+        
+        @Override
+        public int hashCode() {
+            int code = 0;
+            for (Class<?> type : types) {
+                code = code * 37 + type.hashCode();
+            }
+            return code;
         }
     }
 }

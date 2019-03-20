@@ -139,13 +139,17 @@ public class PatternParser {
         Pattern.Builder builder = Pattern.builder();
         int exprStart = -1;
         int exprEnd = 0;
-        for (int i = 0; i < input.length(); i++) {
+        
+        StringBuilder literal = new StringBuilder();
+        boolean whitespace = true; // Ignore whitespace at start
+        for (int i = 0; i < input.length();) {
             int c = input.codePointAt(i);
             
             if (c == '%') {
                 if (exprStart == -1) {
                     exprStart = i;
-                    builder.literal(input.substring(exprEnd, exprStart));
+                    builder.literal(literal.toString());
+                    literal = new StringBuilder();
                 } else {
                     exprEnd = i + 1;
                     String exprInput = input.substring(exprStart + 1, exprEnd);
@@ -163,6 +167,16 @@ public class PatternParser {
                     }
                     builder.expression(types);
                 }
+            } else { // Don't have double whitespace in literals
+                if (Character.isWhitespace(c)) {
+                    if (!whitespace && input.length() - 1 != i) {
+                        literal.appendCodePoint(c);
+                    }
+                    whitespace = true;
+                } else {
+                    whitespace = false;
+                    literal.appendCodePoint(c);
+                }
             }
             
             i += Character.charCount(c);
@@ -170,7 +184,7 @@ public class PatternParser {
         
         // Last literal part, if it exists
         if (exprEnd != input.length()) {
-            builder.literal(input.substring(exprEnd));
+            builder.literal(literal.toString());
         }
         
         if (exprStart != -1) {

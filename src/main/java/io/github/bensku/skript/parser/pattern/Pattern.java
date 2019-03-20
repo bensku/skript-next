@@ -53,6 +53,11 @@ public class Pattern {
      */
     private int compilerId;
     
+    /**
+     * Cached hash code.
+     */
+    private int hashCode;
+    
     public Pattern(PatternPart[] parts) {
         assert parts != null;
         assert parts.length > 0;
@@ -116,4 +121,17 @@ public class Pattern {
         }
         return Arrays.equals(parts, ((Pattern) o).parts);
     }
+    
+    @Override
+    public int hashCode() {
+        if (hashCode == 0) {
+            int code = 0;
+            for (PatternPart part : parts) {
+                code = code * 37 + part.hashCode();
+            }
+            hashCode = code;
+        }
+        return hashCode;
+    }
+    
 }
