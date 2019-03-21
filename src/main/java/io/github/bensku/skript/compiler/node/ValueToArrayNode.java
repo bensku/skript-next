@@ -23,7 +23,7 @@ public class ValueToArrayNode implements Node {
 
     @Override
     public Class<?> getReturnType() {
-        return node.getClass(); // TODO implement array stuff
+        return Array.newInstance(node.getReturnType(), 0).getClass();
     }
     
     @Override

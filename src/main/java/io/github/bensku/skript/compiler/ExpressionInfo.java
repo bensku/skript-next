@@ -5,10 +5,10 @@ import java.lang.reflect.Method;
 public class ExpressionInfo {
 
     /**
-     * The method that executes this expression. Its parameters are child
-     * expressions of this expression.
+     * The methods that execute this expression, in order of preference.
+     * Arguments to them are parameters given to us.
      */
-    private final Method callTarget;
+    private final Method[] callTargets;
 
     /**
      * Whether this expression is a constant or not. Constant expressions are
@@ -22,17 +22,25 @@ public class ExpressionInfo {
      */
     private final boolean isConstantFoldable;
 
-    public ExpressionInfo(Method callTarget, boolean isConstant, boolean isConstantFoldable) {
-        assert callTarget != null;
-        assert callTarget.isAccessible();
+    public ExpressionInfo(Method[] callTargets, boolean isConstant, boolean isConstantFoldable) {
+        assert callTargets != null;
+        assert callTargets.length > 0;
+        assert validateCallTargets();
         assert isConstant ? isConstantFoldable : true;
-        this.callTarget = callTarget;
+        this.callTargets = callTargets;
         this.isConstant = isConstant;
         this.isConstantFoldable = isConstantFoldable;
     }
+    
+    private boolean validateCallTargets() {
+        for (Method m : callTargets) {
+            assert m.isAccessible();
+        }
+        return true;
+    }
 
-    public Method getCallTarget() {
-        return callTarget;
+    public Method[] getCallTargets() {
+        return callTargets;
     }
 
     public boolean isConstant() {

@@ -7,6 +7,7 @@ import java.lang.reflect.Parameter;
 import io.github.bensku.skript.compiler.node.ConstantNode;
 import io.github.bensku.skript.compiler.node.ExecutableNode;
 import io.github.bensku.skript.compiler.node.Node;
+import io.github.bensku.skript.compiler.node.ValueToArrayNode;
 import io.github.bensku.skript.parser.AstNode;
 import io.github.bensku.skript.util.SneakyThrow;
 
@@ -35,7 +36,37 @@ public class ExpressionCompiler {
     public Node compile(AstNode node) {
         assert node != null;
         ExpressionInfo info = infos[node.getPattern().getCompilerId()];
-        Method callTarget = info.getCallTarget();
+        Method[] callTargets = info.getCallTargets();
+        
+        Method callTarget = null;
+        Node[] children = null;
+        boolean foldable = info.isConstantFoldable(); // Assume constant-foldable if allowed
+        for (Method target : callTargets) {
+            // Compile child expressions
+            children = new Node[target.getParameterCount()];
+            Parameter[] params = target.getParameters();
+            for (int i = 0; i < children.length; i++) {
+                Node child = compile(node.getChildren()[i]);
+                if (child instanceof ExecutableNode) {
+                    foldable = false; // Can't fold with non-constant children
+                }
+                
+                // Convert single parameters to arrays as needed
+                Class<?> type = params[i].getType();
+                if (type.isArray() && !child.getReturnType().isArray()) {
+                    child = new ValueToArrayNode(child);
+                }
+                // Check that parameters are correct now
+                if (!type.equals(child.getReturnType())) {
+                    continue; // Try next call target
+                }
+                
+                children[i] = child;
+            }
+            callTarget = target;
+        }
+        assert callTarget != null;
+        
         Object instance;
         try {
             instance = callTarget.getDeclaringClass().getConstructor().newInstance();
@@ -44,23 +75,6 @@ public class ExpressionCompiler {
             SneakyThrow.sneakyThrow(e);
             assert false;
             return null;
-        }
-        
-        // Compile child expressions
-        Node[] children = new Node[callTarget.getParameterCount()];
-        Parameter[] params = callTarget.getParameters();
-        boolean foldable = info.isConstantFoldable(); // Assume constant-foldable if allowed
-        for (int i = 0; i < children.length; i++) {
-            Node child = compile(node.getChildren()[i]);
-            children[i] = child;
-            if (child instanceof ExecutableNode) {
-                foldable = false; // Can't fold with non-constant children
-            }
-            
-            // Convert single parameters to arrays as needed
-            if (params[i].getType().isArray() && !child.getReturnType().isArray()) {
-                
-            }
         }
         
         // Create the executable node
