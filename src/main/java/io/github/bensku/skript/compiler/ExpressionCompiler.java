@@ -3,6 +3,7 @@ package io.github.bensku.skript.compiler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.function.Function;
 
 import io.github.bensku.skript.compiler.node.ConstantNode;
 import io.github.bensku.skript.compiler.node.ExecutableNode;
@@ -37,6 +38,15 @@ public class ExpressionCompiler {
         assert node != null;
         ExpressionInfo info = infos[node.getPattern().getCompilerId()];
         Method[] callTargets = info.getCallTargets();
+        Function<AstNode, Node> compilerHook = info.getCompilerHook();
+        if (compilerHook != null) { // Apply compiler hook if it exists
+            Node result = compilerHook.apply(node);
+            if (result != null) { // When it applies, return what it returned
+                return result;
+            }
+        }
+        assert callTargets != null;
+        assert callTargets.length > 0;
         
         Method callTarget = null;
         Node[] children = null;

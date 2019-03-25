@@ -5,17 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Marks a call target of this expression.
- *
- */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface CallTarget {
-    
-    /**
-     * Priority of call target.
-     * @return Call target.
-     */
-    int value() default 0;
+public @interface ConstantFoldable {
+
 }

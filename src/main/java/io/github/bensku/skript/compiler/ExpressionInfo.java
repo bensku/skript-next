@@ -1,6 +1,10 @@
 package io.github.bensku.skript.compiler;
 
 import java.lang.reflect.Method;
+import java.util.function.Function;
+
+import io.github.bensku.skript.compiler.node.Node;
+import io.github.bensku.skript.parser.AstNode;
 
 public class ExpressionInfo {
 
@@ -21,15 +25,22 @@ public class ExpressionInfo {
      * constant-folded, this can be executed compile-time.
      */
     private final boolean isConstantFoldable;
+    
+    /**
+     * If this exists, it may provide nodes from AST nodes.
+     */
+    private final Function<AstNode, Node> compilerHook;
 
-    public ExpressionInfo(Method[] callTargets, boolean isConstant, boolean isConstantFoldable) {
-        assert callTargets != null;
+    public ExpressionInfo(Method[] callTargets, boolean isConstant, boolean isConstantFoldable,
+            Function<AstNode, Node> compilerHook) {
+        assert callTargets != null || compilerHook != null;
         assert callTargets.length > 0;
         assert validateCallTargets();
         assert isConstant ? isConstantFoldable : true;
         this.callTargets = callTargets;
         this.isConstant = isConstant;
         this.isConstantFoldable = isConstantFoldable;
+        this.compilerHook = compilerHook;
     }
     
     private boolean validateCallTargets() {
@@ -50,5 +61,8 @@ public class ExpressionInfo {
     public boolean isConstantFoldable() {
         return isConstantFoldable;
     }
-
+    
+    public Function<AstNode, Node> getCompilerHook() {
+        return compilerHook;
+    }
 }
