@@ -35,9 +35,9 @@ public class ExpressionInfo {
             Function<AstNode, Node> compilerHook) {
         assert callTargets != null || compilerHook != null;
         assert callTargets.length > 0;
-        assert validateCallTargets();
         assert isConstant ? isConstantFoldable : true;
         this.callTargets = callTargets;
+        assert callTargets == null || validateCallTargets();
         this.isConstant = isConstant;
         this.isConstantFoldable = isConstantFoldable;
         this.compilerHook = compilerHook;

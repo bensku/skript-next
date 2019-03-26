@@ -24,7 +24,7 @@ public class CompilerTests {
     public void constantNode() throws NoSuchMethodException, SecurityException {
         Method method = getClass().getDeclaredMethod("callNothing");
         method.setAccessible(true); // ???
-        ExpressionCompiler compiler = new ExpressionCompiler(new ExpressionInfo(new Method[] {method}, true, true));
+        ExpressionCompiler compiler = new ExpressionCompiler(new ExpressionInfo(new Method[] {method}, true, true, null));
         Pattern pattern = Pattern.builder().literal("test").build();
         pattern.setCompilerId(0);
         AstNode node = new AstNode(pattern, new AstNode[1]);
@@ -39,7 +39,7 @@ public class CompilerTests {
     public void nonFoldableNode() throws NoSuchMethodException, SecurityException {
         Method method = getClass().getDeclaredMethod("callNothing");
         method.setAccessible(true); // ???
-        ExpressionCompiler compiler = new ExpressionCompiler(new ExpressionInfo(new Method[] {method}, false, false));
+        ExpressionCompiler compiler = new ExpressionCompiler(new ExpressionInfo(new Method[] {method}, false, false, null));
         Pattern pattern = Pattern.builder().literal("test").build();
         pattern.setCompilerId(0);
         AstNode node = new AstNode(pattern, new AstNode[1]);

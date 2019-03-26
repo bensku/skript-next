@@ -3,9 +3,7 @@ package io.github.bensku.skript.annotate;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import io.github.bensku.skript.compiler.ExpressionCompiler;
 import io.github.bensku.skript.compiler.ExpressionInfo;
@@ -16,19 +14,13 @@ import io.github.bensku.skript.parser.pattern.PatternRegistry;
 import io.github.bensku.skript.parser.pattern.ReturnType;
 
 /**
- * Allows registration of types and expressions, and can create parsers and
- * compilers that understand them.
+ * Allows registration of expressions.
  *
  */
-public class SkriptRegistry {
+public class ExpressionRegistry {
     
     /**
-     * Types registered here. Mutates internals of {@link #patternParser}.
-     */
-    private final Map<String, Class<?>> types;
-    
-    /**
-     * Pattern parser. New types are added by modifying {@link #types}.
+     * Pattern parser that knows about types that might be used.
      */
     private final PatternParser patternParser;
     
@@ -43,25 +35,12 @@ public class SkriptRegistry {
      */
     private final PatternRegistry patternRegistry;
     
-    public SkriptRegistry() {
-        this.types = new HashMap<>();
-        this.patternParser = new PatternParser(types);
+    public ExpressionRegistry(TypeRegistry types) {
+        this.patternParser = new PatternParser(types.types);
         this.exprInfos = new ArrayList<>();
         this.patternRegistry = new PatternRegistry();
     }
     
-    /**
-     * Registers a type with given name.
-     * @param name Name for the type. This is used in patterns to refer to it.
-     * @param type Actual type.
-     */
-    public void registerType(String name, Class<?> type) {
-        if (types.containsKey(name)) {
-            throw new IllegalArgumentException("cannot re-register type " + name);
-        }
-        types.put(name, type);
-    }
-
     /**
      * Call target method and a priority, sortable.
      *
