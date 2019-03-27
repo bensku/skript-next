@@ -35,4 +35,18 @@ public class BasicBlock {
             }
         }
     }
+
+    public Node getCondition() {
+        return condition;
+    }
+
+    public boolean isRepeatable() {
+        return repeatable;
+    }
+
+    public Node[] getNodes() {
+        return nodes;
+    }
+    
+    
 }

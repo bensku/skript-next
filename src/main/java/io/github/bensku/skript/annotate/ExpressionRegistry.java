@@ -64,8 +64,9 @@ public class ExpressionRegistry {
     /**
      * Registers an expression whose features are specified by annotations.
      * @param type Expression class, with necessary annotations declared.
+     * @return Compiler id for this expression.
      */
-    public void register(Class<?> type) {
+    public int register(Class<?> type) {
         Patterns patterns = type.getDeclaredAnnotation(Patterns.class);
         if (patterns == null) {
             throw new IllegalArgumentException("expression must define patterns");
@@ -109,6 +110,7 @@ public class ExpressionRegistry {
                 pattern.setCompilerId(infoIndex); // Compiler will know info based on this
             }
         }
+        return infoIndex;
     }
     
     /**
