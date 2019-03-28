@@ -1,4 +1,4 @@
-package io.github.bensku.skript;
+package io.github.bensku.skript.parser;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -51,6 +51,5 @@ public class Source {
     public List<String> getLines() {
         return lines;
     }
-    
     
 }

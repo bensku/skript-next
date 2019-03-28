@@ -11,7 +11,6 @@ import io.github.bensku.skript.compiler.node.ConstantNode;
 import io.github.bensku.skript.parser.ExpressionParser;
 import io.github.bensku.skript.parser.pattern.PatternParser;
 import io.github.bensku.skript.parser.pattern.PatternRegistry;
-import io.github.bensku.skript.parser.pattern.ReturnType;
 
 /**
  * Allows registration of expressions.

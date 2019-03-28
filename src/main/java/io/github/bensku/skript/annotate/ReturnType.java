@@ -1,4 +1,4 @@
-package io.github.bensku.skript.parser.pattern;
+package io.github.bensku.skript.annotate;
 
 public @interface ReturnType {
     

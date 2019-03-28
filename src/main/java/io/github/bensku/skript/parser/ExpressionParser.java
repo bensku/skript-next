@@ -18,6 +18,24 @@ import io.github.bensku.skript.util.StringUtils;
 public class ExpressionParser {
     
     /**
+     * Expression parser configuration.
+     *
+     */
+    public static class Config {
+        
+        public static class Builder {
+            
+        }
+        
+        /**
+         * Requests the parser to create actual error messages in addition to
+         * just not returning AST nodes. This may significantly slow down the
+         * parser, so consider enabling it only once something fails to parse.
+         */
+        private boolean errorMessages;
+    }
+    
+    /**
      * Pattern bundles by their return types.
      */
     private final Map<Class<?>, PatternBundle> bundles;
@@ -226,7 +244,7 @@ public class ExpressionParser {
                     j = pos + len;
                 }
                 if (placements.isEmpty()) {
-                    return null; // Failed to find a part, pattern doesn't match+
+                    return null; // Failed to find a part, pattern doesn't match
                 } else {
                     starts[i] = placements;
                 }
